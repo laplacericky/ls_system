@@ -2,11 +2,6 @@
 import argparse,sys
 import subprocess
 from pathlib import Path
-import re
-
-def search_keyword(keyword, search_space):
-    r = re.compile(rf"(?i).*{keyword}.*")
-    return filter(r.match, search_space)
 
 def print_limited_lines(lines, start, end, step):
     limited_lines = lines[start: end: step]
@@ -17,24 +12,9 @@ def print_limited_lines(lines, start, end, step):
     else:
         print('(END)')
 
-def all_files_and_dirs(d):
-    result = []
-    for x in d.iterdir():
-        result.append(x)
-        if not x.is_symlink() and x.is_dir():
-            result += all_files_and_dirs(x)
-    return result
-
-
-def search_name(keyword):
-    search_space = {}
-    for x in sorted(all_files_and_dirs(Path('.') ), key=lambda y: len(y.parents)   ):
-        if x.name not in search_space:
-            search_space[x.name] = [x]
-        else:
-            search_space[x.name].append(x)
-
-    return [str(x) for k in search_keyword(keyword, search_space) for x in search_space[k]]
+def search_name(pattern):
+    matched = Path('.').rglob(pattern)
+    return [str(x) for x in sorted(matched, key=lambda y: len(y.parents) )]
 
 def by_date():
     return subprocess.run(['ls', '-Alht'], stdout = subprocess.PIPE, text = True, check = True).stdout.splitlines()[1:]
