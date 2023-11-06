@@ -27,8 +27,14 @@ def all_files_and_dirs(d):
 
 
 def search_name(keyword):
-    search_space = {x.name: x for x in all_files_and_dirs(Path('.'))}
-    return [str(search_space[k]) for k in search_keyword(keyword, search_space)]
+    search_space = {}
+    for x in sorted(all_files_and_dirs(Path('.') ), key=lambda y: len(y.parents)   ):
+        if x.name not in search_space:
+            search_space[x.name] = [x]
+        else:
+            search_space[x.name].append(x)
+
+    return [str(x) for k in search_keyword(keyword, search_space) for x in search_space[k]]
 
 def by_date():
     return subprocess.run(['ls', '-Alht'], stdout = subprocess.PIPE, text = True, check = True).stdout.splitlines()[1:]
@@ -42,6 +48,7 @@ def main():
     parser.add_argument('mode', choices = ['largest','smallest','newest','oldest','search'] )
     parser.add_argument('target', nargs='?')
     parser.add_argument('-n', '--head', type=int, default = 10)
+    parser.add_argument('-a','--all',action='store_true')
     args = parser.parse_args()
 
     match args.mode:
@@ -63,16 +70,16 @@ def main():
             start = -1
             end = -args.head-1
             step = -1
-        case 'smallest'|'newest':
+        case 'smallest'|'newest'|'search':
             start = 0
             end = args.head
             step = 1
-        case 'search':
-            start = 0
-            end = len(result)
-            step = 1
 
-    print_limited_lines(result, start, end, step)
+    if args.all:
+        for x in result:
+            print(x)
+    else:
+        print_limited_lines(result, start, end, step)
 
 
 if __name__ == '__main__':
