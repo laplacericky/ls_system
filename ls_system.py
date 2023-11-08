@@ -2,15 +2,7 @@
 import argparse,sys
 import subprocess
 from pathlib import Path
-
-def print_limited_lines(lines, start, end, step):
-    limited_lines = lines[start: end: step]
-    for x in limited_lines:
-        print(x)
-    if len(limited_lines) < len(lines):
-        print(f'--More--({len(limited_lines):d}/{len(lines):d})')
-    else:
-        print('(END)')
+from lib_output import limited_lines
 
 def search_name(pattern):
     matched = Path('.').rglob(pattern)
@@ -59,7 +51,7 @@ def main():
         for x in result:
             print(x)
     else:
-        print_limited_lines(result, start, end, step)
+        print(limited_lines(result, start, end, step, more_info = True))
 
 
 if __name__ == '__main__':
