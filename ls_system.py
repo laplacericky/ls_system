@@ -2,7 +2,7 @@
 import argparse,sys
 import subprocess
 from pathlib import Path
-from lib_output import limited_lines
+from lib_io import limited_lines
 
 def search_name(pattern):
     matched = Path('.').rglob(pattern)
