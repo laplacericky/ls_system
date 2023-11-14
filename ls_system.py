@@ -21,7 +21,9 @@ def compare(f1, f2):
         assert f2.is_file()
     else:
         assert f2.is_dir()
-    return subprocess.run(['git', 'diff', '--no-index', '--name-status', f1, f2], stdout = subprocess.PIPE, text = True).stdout.splitlines()
+    r = subprocess.run(['git', 'diff', '--no-index', '--name-status', f1, f2], stdout = subprocess.PIPE, text = True)
+    assert r.returncode == 0 or r.returncode == 1
+    return r.stdout.splitlines()
 
 def main():
     parser = argparse.ArgumentParser()
